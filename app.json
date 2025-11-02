@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "physio-at-homes-app",
-    "slug": "physio-at-homes-app",
+    "name": "PhysioAtHomes",
+    "slug": "physioathomes",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
