@@ -1,6 +1,6 @@
+import ServiceListItem from "@/src/components/ServiceListItem";
 import { Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
-import { FlatList, Text, TextInput, View } from "react-native";
+import { FlatList, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const services = [
@@ -25,12 +25,12 @@ export default function HomeScreen() {
                 name="search"
                 size={18}
                 color={"gray"}
-                style={{ position: "absolute", left: 12, top: 10, zIndex: 1 }}
+                style={{ position: "absolute", left: 12, top: 13, zIndex: 1 }}
               />
               <TextInput
                 placeholder="Search"
                 placeholderTextColor={"gray"}
-                className="rounded-md p-2 py-3 pl-10"
+                className="rounded-md p-2 py-4 pl-10"
               />
             </View>
           </View>
@@ -40,15 +40,7 @@ export default function HomeScreen() {
         <FlatList
           data={services}
           renderItem={({ item }) => {
-            return (
-              <View className="bg-gray-100 rounded-md flex-1 justify-between items-center px-2 py-4">
-                <Image
-                  source={require("@/assets/images/services/back-pain.png")}
-                  style={{ width: 50, height: 50 }}
-                />
-                <Text className="text-gray-900 text-center">{item}</Text>
-              </View>
-            );
+            return <ServiceListItem item={item} />;
           }}
           numColumns={2}
           contentContainerStyle={{ gap: 10, paddingVertical: 10 }} // Style between rows
