@@ -3,11 +3,9 @@ import React from "react";
 
 import { HapticTab } from "@/src/components/haptic-tab";
 import { IconSymbol } from "@/src/components/ui/icon-symbol";
-import { useColorScheme } from "@/src/hooks/use-color-scheme";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
@@ -31,6 +29,15 @@ export default function TabLayout() {
           title: "Explore",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="paperplane.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="person" size={28} color={color} />
           ),
         }}
       />

@@ -48,17 +48,17 @@ const features: Array<{
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 bg-white">
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 }}
       >
         {/* Hero Section */}
-        <View className="flex w-full bg-white px-4">
+        <View className="flex w-full px-4">
           {/* Search */}
           <View className="w-full py-2 mb-4">
-            <View className="bg-white shadow-md rounded-md">
+            <View className="rounded-md">
               <View className="relative">
                 <Ionicons
                   name="search"
@@ -69,7 +69,7 @@ export default function HomeScreen() {
                 <TextInput
                   placeholder="Search"
                   placeholderTextColor={"gray"}
-                  className="rounded-md p-2 py-4 pl-10"
+                  className="border rounded-md p-2 py-4 pl-10"
                 />
               </View>
             </View>
@@ -95,7 +95,7 @@ export default function HomeScreen() {
             {features.map((item, index) => (
               <View
                 key={index}
-                className="bg-white p-2 py-4 mt-2 rounded-md flex-1 items-center"
+                className="bg-gray-100 p-2 py-4 mt-2 rounded-md flex-1 items-center"
               >
                 <Ionicons name={item.icon} size={30} />
                 <Text className="text-center text-lg font-medium">
