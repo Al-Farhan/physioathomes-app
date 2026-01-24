@@ -15,10 +15,10 @@ const SignUpScreen = () => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      phone,
       options: {
         data: {
           fullName,
+          phone,
         },
       },
     });
