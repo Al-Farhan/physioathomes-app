@@ -1,7 +1,18 @@
 import ServiceListItem from "@/src/components/ServiceListItem";
 import Button from "@/src/components/ui/Button";
+import { useAuth } from "@/src/providers/AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
-import { FlatList, ScrollView, Text, TextInput, View } from "react-native";
+import { Link } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
@@ -47,6 +58,26 @@ const features: Array<{
 ];
 
 export default function HomeScreen() {
+  const [user, setUser] = useState<any>(null);
+  const [userIcon, setUserIcon] = useState("G");
+  const { loading, session } = useAuth();
+
+  useEffect(() => {
+    if (session) {
+      setUser(session?.user?.user_metadata);
+
+      const userName = session?.user?.user_metadata?.fullName;
+      if (userName) {
+        const [firstLetter, lastLetter] = userName.split(" ");
+        setUserIcon(`${firstLetter[0]}${lastLetter[0]}`);
+      }
+    }
+  }, [session]);
+
+  if (loading) {
+    return <ActivityIndicator />;
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
@@ -54,6 +85,31 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 }}
       >
+        {/* User Icon and Name */}
+        {session ? (
+          <Link href="/(user)/profile" asChild>
+            <Pressable className="px-4" android_ripple={{ color: "gray" }}>
+              <View className="flex-row items-center gap-2">
+                <View className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center">
+                  <Text className="text-xl text-center">{userIcon}</Text>
+                </View>
+                <Text className="text-lg font-medium text-gray-700">
+                  {user?.fullName}
+                </Text>
+              </View>
+            </Pressable>
+          </Link>
+        ) : (
+          <View className="px-4">
+            <View className="flex-row items-center gap-2">
+              <View className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center">
+                <Text className="text-xl text-center">G</Text>
+              </View>
+              <Text className="text-lg font-medium text-gray-700">Guest</Text>
+            </View>
+          </View>
+        )}
+
         {/* Hero Section */}
         <View className="flex w-full px-4">
           {/* Search */}
