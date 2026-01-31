@@ -22,11 +22,16 @@ export default function RootLayout() {
                 headerShown: false,
               }}
             />
-            <Stack.Screen
-              name="modal"
-              options={{ presentation: "modal", title: "Modal" }}
-            />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(modals)/service-details"
+              options={{
+                presentation: "modal",
+                headerShown: false,
+                // statusBarTranslucent: true,
+                statusBarStyle: "dark",
+              }}
+            />
           </Stack>
           <StatusBar style="dark" backgroundColor="white" />
         </AuthProvider>

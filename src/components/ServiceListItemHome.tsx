@@ -7,9 +7,9 @@ type ServiceListItemProp = {
   item: string;
 };
 
-const ServiceListItem = ({ item }: ServiceListItemProp) => {
+const ServiceListItemHome = ({ item }: ServiceListItemProp) => {
   return (
-    <Link href="/(user)/explore" asChild>
+    <Link href="/(user)/services" asChild>
       <Pressable className="bg-gray-100 rounded-md flex-1 justify-between items-center px-2 py-4">
         <Image
           source={require("@/assets/images/services/back-pain.png")}
@@ -21,4 +21,4 @@ const ServiceListItem = ({ item }: ServiceListItemProp) => {
   );
 };
 
-export default ServiceListItem;
+export default ServiceListItemHome;

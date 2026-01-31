@@ -21,7 +21,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="services"
         options={{
           title: "Services",
           tabBarIcon: ({ color }) => <Grip size={24} color={color} />,

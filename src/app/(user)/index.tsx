@@ -1,4 +1,4 @@
-import ServiceListItem from "@/src/components/ServiceListItem";
+import ServiceListItem from "@/src/components/ServiceListItemHome";
 import Button from "@/src/components/ui/Button";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
@@ -79,7 +79,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
