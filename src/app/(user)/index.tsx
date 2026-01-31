@@ -75,7 +75,11 @@ export default function HomeScreen() {
   }, [session]);
 
   if (loading) {
-    return <ActivityIndicator />;
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator />
+      </View>
+    );
   }
 
   return (
@@ -163,6 +167,26 @@ export default function HomeScreen() {
               </View>
             ))}
           </View>
+        </View>
+
+        {/* Small videos auto play */}
+        <View className="px-4 mt-4 w-full">
+          <Text className="text-md mb-2 text-gray-700">
+            Real lives, real impact
+          </Text>
+          <FlatList
+            data={[1, 2, 3, 4]}
+            horizontal
+            contentContainerStyle={{ gap: 10 }}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => {
+              return (
+                <View className="bg-black rounded-md w-48 h-72">
+                  <Text>{item}</Text>
+                </View>
+              );
+            }}
+          />
         </View>
       </ScrollView>
 
