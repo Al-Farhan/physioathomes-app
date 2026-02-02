@@ -1,6 +1,10 @@
 import ServiceListItem from "@/src/components/ServiceListItemHome";
 import Button from "@/src/components/ui/Button";
+import { LocationHeader } from "@/src/components/ui/location/location-header";
+import { LocationPickerModal } from "@/src/components/ui/location/location-picker-modal";
 import { useAuth } from "@/src/providers/AuthProvider";
+import { useLocation } from "@/src/providers/LocationProvider";
+import { LocationData } from "@/src/types/location";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
@@ -58,9 +62,25 @@ const features: Array<{
 ];
 
 export default function HomeScreen() {
+  const { status, data, refreshLocation, setLocationData } = useLocation();
+  const { loading, session } = useAuth();
   const [user, setUser] = useState<any>(null);
   const [userIcon, setUserIcon] = useState("G");
-  const { loading, session } = useAuth();
+  const [isRefreshingLocation, setIsRefreshingLocation] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+
+  const isLoadingLocation = [
+    "requesting_permission",
+    "fetching_location",
+    "fetching_address",
+  ].includes(status);
+
+  const handleLocationSelect = (location: LocationData) => {
+    // Handle the selected location
+    // You might want to update your context or state here
+    console.log("Selected location:", location);
+    setLocationData(location);
+  };
 
   useEffect(() => {
     if (session) {
@@ -89,30 +109,39 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 }}
       >
-        {/* User Icon and Name */}
-        {session ? (
-          <Link href="/(user)/profile" asChild>
-            <Pressable className="px-4" android_ripple={{ color: "gray" }}>
+        <View className="flex-row items-center justify-between">
+          {/* User Icon and Name */}
+          {session ? (
+            <Link href="/(user)/profile" asChild>
+              <Pressable className="px-4" android_ripple={{ color: "gray" }}>
+                <View className="flex-row items-center gap-2">
+                  <View className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center">
+                    <Text className="text-xl text-center">{userIcon}</Text>
+                  </View>
+                  <Text className="text-lg font-medium text-gray-700">
+                    {user?.fullName}
+                  </Text>
+                </View>
+              </Pressable>
+            </Link>
+          ) : (
+            <View className="px-4">
               <View className="flex-row items-center gap-2">
                 <View className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center">
-                  <Text className="text-xl text-center">{userIcon}</Text>
+                  <Text className="text-xl text-center">G</Text>
                 </View>
-                <Text className="text-lg font-medium text-gray-700">
-                  {user?.fullName}
-                </Text>
+                <Text className="text-lg font-medium text-gray-700">Guest</Text>
               </View>
-            </Pressable>
-          </Link>
-        ) : (
-          <View className="px-4">
-            <View className="flex-row items-center gap-2">
-              <View className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center">
-                <Text className="text-xl text-center">G</Text>
-              </View>
-              <Text className="text-lg font-medium text-gray-700">Guest</Text>
             </View>
-          </View>
-        )}
+          )}
+
+          {/* Location Header */}
+          {isLoadingLocation ? (
+            <ActivityIndicator />
+          ) : (
+            <LocationHeader onPress={() => setShowLocationPicker(true)} />
+          )}
+        </View>
 
         {/* Hero Section */}
         <View className="flex w-full px-4">
@@ -197,6 +226,12 @@ export default function HomeScreen() {
           onPress={() => console.info("Book now button pressed")}
         />
       </View>
+
+      <LocationPickerModal
+        visible={showLocationPicker}
+        onClose={() => setShowLocationPicker(false)}
+        onSelectLocation={handleLocationSelect}
+      />
     </SafeAreaView>
   );
 }

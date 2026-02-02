@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../../global.css";
 import AuthProvider from "../providers/AuthProvider";
+import { LocationProvider } from "../providers/LocationProvider";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -14,26 +15,28 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <ThemeProvider value={DefaultTheme}>
         <AuthProvider>
-          <Stack>
-            <Stack.Screen
-              name="(user)"
-              options={{
-                title: "Home",
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(modals)/service-details"
-              options={{
-                presentation: "modal",
-                headerShown: false,
-                // statusBarTranslucent: true,
-                statusBarStyle: "dark",
-              }}
-            />
-          </Stack>
-          <StatusBar style="dark" backgroundColor="white" />
+          <LocationProvider autoFetch={true}>
+            <Stack>
+              <Stack.Screen
+                name="(user)"
+                options={{
+                  title: "Home",
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(modals)/service-details"
+                options={{
+                  presentation: "modal",
+                  headerShown: false,
+                  // statusBarTranslucent: true,
+                  statusBarStyle: "dark",
+                }}
+              />
+            </Stack>
+            <StatusBar style="dark" backgroundColor="white" />
+          </LocationProvider>
         </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>
