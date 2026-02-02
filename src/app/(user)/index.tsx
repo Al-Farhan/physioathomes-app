@@ -1,4 +1,5 @@
 import ServiceListItem from "@/src/components/ServiceListItemHome";
+import Skeleton from "@/src/components/skeleton/skeleton";
 import Button from "@/src/components/ui/Button";
 import { LocationHeader } from "@/src/components/ui/location/location-header";
 import { LocationPickerModal } from "@/src/components/ui/location/location-picker-modal";
@@ -96,9 +97,29 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator />
-      </View>
+      <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+        <View className="p-4 gap-y-4">
+          <View className="flex-row items-center justify-between">
+            <Skeleton variant="circle" className="w-10 h-10 my-2" />
+            <Skeleton variant="box" className="w-40 h-10" />
+          </View>
+          <View>
+            <Skeleton className="w-full h-10" />
+          </View>
+          <View className="flex-row flex-wrap gap-2 justify-center items-center">
+            <Skeleton className="w-48 h-32" />
+            <Skeleton className="w-48 h-32" />
+            <Skeleton className="w-48 h-32" />
+            <Skeleton className="w-48 h-32" />
+            <Skeleton className="w-48 h-32" />
+            <Skeleton className="w-48 h-32" />
+          </View>
+          <View className="gap-y-4">
+            <Skeleton className="w-full h-40" />
+            <Skeleton className="w-full h-40" />
+          </View>
+        </View>
+      </SafeAreaView>
     );
   }
 
