@@ -30,12 +30,10 @@ export default function RootLayout() {
                 options={{
                   presentation: "modal",
                   headerShown: false,
-                  // statusBarTranslucent: true,
-                  statusBarStyle: "dark",
                 }}
               />
             </Stack>
-            <StatusBar style="dark" backgroundColor="white" />
+            <StatusBar style="dark" />
           </LocationProvider>
         </AuthProvider>
       </ThemeProvider>

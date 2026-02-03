@@ -1,6 +1,5 @@
-import ServiceListItem from "@/src/components/ServiceListItemHome";
+import ServiceListItemHome from "@/src/components/ServiceListItemHome";
 import Skeleton from "@/src/components/skeleton/skeleton";
-import Button from "@/src/components/ui/Button";
 import { LocationHeader } from "@/src/components/ui/location/location-header";
 import { LocationPickerModal } from "@/src/components/ui/location/location-picker-modal";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -13,11 +12,20 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
+  RefreshControl,
   ScrollView,
   Text,
   TextInput,
   View,
 } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
@@ -63,12 +71,18 @@ const features: Array<{
 ];
 
 export default function HomeScreen() {
-  const { status, data, refreshLocation, setLocationData } = useLocation();
+  const { status, refreshLocation, setLocationData } = useLocation();
   const { loading, session } = useAuth();
+  const ctaButtonRotation = useSharedValue<number>(0);
   const [user, setUser] = useState<any>(null);
   const [userIcon, setUserIcon] = useState("G");
   const [isRefreshingLocation, setIsRefreshingLocation] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+
+  const rotationDuration = 2000;
+  const easing = Easing.elastic(1.5);
+  const ANGLE = 5;
+  const TIME = 1000;
 
   const isLoadingLocation = [
     "requesting_permission",
@@ -83,6 +97,12 @@ export default function HomeScreen() {
     setLocationData(location);
   };
 
+  const handleRefresh = async () => {
+    setIsRefreshingLocation(true);
+    await refreshLocation();
+    setIsRefreshingLocation(false);
+  };
+
   useEffect(() => {
     if (session) {
       setUser(session?.user?.user_metadata);
@@ -94,6 +114,20 @@ export default function HomeScreen() {
       }
     }
   }, [session]);
+
+  useEffect(() => {
+    ctaButtonRotation.value = withRepeat(
+      withSequence(
+        withTiming(-ANGLE, { duration: TIME / 2, easing }),
+        withRepeat(withTiming(ANGLE, { duration: TIME, easing }), -1, true),
+        withTiming(0, { duration: TIME / 2, easing })
+      )
+    );
+  }, []);
+
+  const ctaButtonAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotateZ: `${ctaButtonRotation.value}deg` }],
+  }));
 
   if (loading) {
     return (
@@ -129,6 +163,13 @@ export default function HomeScreen() {
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshingLocation}
+            onRefresh={handleRefresh}
+            tintColor="#10b981"
+          />
+        }
       >
         <View className="flex-row items-center justify-between">
           {/* User Icon and Name */}
@@ -188,8 +229,9 @@ export default function HomeScreen() {
           {/* Hero content */}
           <FlatList
             data={services}
+            keyExtractor={(item) => item}
             renderItem={({ item }) => {
-              return <ServiceListItem item={item} />;
+              return <ServiceListItemHome item={item} />;
             }}
             numColumns={2}
             scrollEnabled={false}
@@ -242,10 +284,18 @@ export default function HomeScreen() {
 
       {/* Bottom floating Button */}
       <View className="absolute bottom-2 w-full items-center">
-        <Button
+        {/* <Button
           text="Book now"
           onPress={() => console.info("Book now button pressed")}
-        />
+        /> */}
+        <Animated.View style={ctaButtonAnimatedStyle}>
+          <Pressable
+            onPress={() => console.info("Book now pressed")}
+            className="bg-[rgba(255,255,255,0.16)] border border-[rgba(255, 255, 255, 0.18)] px-8 py-4 rounded-md"
+          >
+            <Text className="text-lg">Book now</Text>
+          </Pressable>
+        </Animated.View>
       </View>
 
       <LocationPickerModal
