@@ -26,6 +26,34 @@ export default function RootLayout() {
               />
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen
+                name="user-profile"
+                options={{
+                  title: "Profile",
+                  headerBackTitle: "Account",
+                }}
+              />
+              <Stack.Screen
+                name="user-payments"
+                options={{
+                  title: "Payments",
+                  headerBackTitle: "Account",
+                }}
+              />
+              <Stack.Screen
+                name="user-activity"
+                options={{
+                  title: "My Activity",
+                  headerBackTitle: "Account",
+                }}
+              />
+              <Stack.Screen
+                name="help"
+                options={{
+                  title: "Help & Support",
+                  headerBackTitle: "Account",
+                }}
+              />
+              <Stack.Screen
                 name="(modals)/service-details"
                 options={{
                   presentation: "modal",

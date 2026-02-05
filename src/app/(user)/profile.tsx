@@ -2,10 +2,36 @@ import Button from "@/src/components/ui/Button";
 import HorizontalLine from "@/src/components/ui/HorizontalLine";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { Link } from "expo-router";
+import { Href, Link } from "expo-router";
+import {
+  ChevronRight,
+  CreditCard,
+  HelpCircle,
+  LucideIcon,
+  SquareChartGantt,
+  User,
+} from "lucide-react-native";
 import React from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+type MenuItemProps = {
+  href: Href;
+  icon: LucideIcon;
+  label: string;
+};
+
+const MenuItem = ({ href, icon: Icon, label }: MenuItemProps) => (
+  <Link href={href} asChild>
+    <Pressable className="px-2 py-4 flex-row items-center justify-between">
+      <View className="flex-row items-center gap-x-2">
+        <Icon size={20} color="gray" />
+        <Text className="text-gray-600 text-lg">{label}</Text>
+      </View>
+      <ChevronRight size={20} color="gray" />
+    </Pressable>
+  </Link>
+);
 
 const Profile = () => {
   const { session, profile, loading } = useAuth();
@@ -28,41 +54,29 @@ const Profile = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-gray-200 gap-y-2">
+    <SafeAreaView className="flex-1 items-center justify-center gap-y-2 bg-white">
       <View className="flex-1 w-full max-w-[26rem] rounded-lg shadow-black bg-white">
         <View className="px-2">
-          <Text className="text-2xl font-bold py-4">Profile</Text>
+          <Text className="text-2xl font-bold py-4">Account</Text>
         </View>
         <HorizontalLine />
-        <View className="px-2 py-4">
-          <Text className="text-gray-600 text-lg">Name</Text>
-          <Text className="font-semibold text-xl">Farhan Shaikh</Text>
-        </View>
+        <MenuItem href="/user-profile" icon={User} label="Profile" />
         <HorizontalLine />
-        <View className="px-2 py-4">
-          <Text className="text-gray-600 text-lg">Email</Text>
-          <Text className="font-semibold text-xl">shaikhfarhan@gmail.com</Text>
-        </View>
+        <MenuItem href="/user-payments" icon={CreditCard} label="Payments" />
         <HorizontalLine />
-        <View className="px-2 py-4">
-          <Text className="text-gray-600 text-lg">Phone</Text>
-          <Text className="font-semibold text-xl">+919702055729</Text>
-        </View>
+        <MenuItem href="/user-activity" icon={SquareChartGantt} label="My Activity" />
         <HorizontalLine />
-        <View className="px-2 py-4">
-          <Text className="text-gray-600 text-lg">Address</Text>
-          <Text className="font-semibold text-xl">
-            J 1031, Akshar Business Park, Sector 25, Near APMC Market, Vashi,
-            400703
-          </Text>
-        </View>
+        <MenuItem href="/help" icon={HelpCircle} label="Help & Support" />
         <HorizontalLine />
+        <View className="px-2 py-4 ">
+          <Pressable
+            className="border border-gray-400 px-2 py-3 items-center"
+            onPress={() => supabase.auth.signOut()}
+          >
+            <Text className="text-red-500">Logout</Text>
+          </Pressable>
+        </View>
       </View>
-      <Button
-        type="outline"
-        text="Sign out"
-        onPress={() => supabase.auth.signOut()}
-      />
     </SafeAreaView>
   );
 };
