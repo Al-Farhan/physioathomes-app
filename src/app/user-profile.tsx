@@ -4,7 +4,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -23,7 +22,7 @@ const UserProfile = () => {
         className="p-4 bg-white"
         contentContainerStyle={{ paddingBottom: 80 }}
       >
-        {/* Prfile Picture */}
+        {/* Profile Picture */}
         <View className="items-center justify-center">
           <CircleUserRound size={100} color="gray" strokeWidth={1} />
           <Text className="text-gray-500 text-sm">ADD PICTURE</Text>
@@ -193,5 +192,3 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
-
-const styles = StyleSheet.create({});

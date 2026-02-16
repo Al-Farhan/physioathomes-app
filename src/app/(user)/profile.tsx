@@ -36,8 +36,8 @@ const MenuItem = ({ href, icon: Icon, label }: MenuItemProps) => (
 const Profile = () => {
   const { session, profile, loading } = useAuth();
 
-  console.log("Profile:", JSON.stringify(profile, null, 2));
-  console.log("Session:", JSON.stringify(session?.user, null, 2));
+  // console.log("Profile:", JSON.stringify(profile, null, 2));
+  // console.log("Session:", JSON.stringify(session?.user, null, 2));
 
   if (loading) {
     return <ActivityIndicator />;
@@ -64,7 +64,11 @@ const Profile = () => {
         <HorizontalLine />
         <MenuItem href="/user-payments" icon={CreditCard} label="Payments" />
         <HorizontalLine />
-        <MenuItem href="/user-activity" icon={SquareChartGantt} label="My Activity" />
+        <MenuItem
+          href="/user-activity"
+          icon={SquareChartGantt}
+          label="My Activity"
+        />
         <HorizontalLine />
         <MenuItem href="/help" icon={HelpCircle} label="Help & Support" />
         <HorizontalLine />
