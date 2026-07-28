@@ -65,7 +65,7 @@ export async function getCoordinatesWithFallback(): Promise<Coordinates> {
 
     // Get fresh location with high accuracy
     return await getCurrentCoordinates();
-  } catch (error) {
+  } catch {
     // Fallback to balanced accuracy if high accuracy fails
     const location = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Balanced,
