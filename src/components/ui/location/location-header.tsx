@@ -1,12 +1,7 @@
 import { useLocation } from "@/src/providers/LocationProvider";
-import { Ionicons } from "@expo/vector-icons";
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { colors } from "@/src/theme/tokens";
+import { ChevronRight, LocateFixed, MapPin } from "lucide-react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 interface LocationHeaderProps {
   onPress?: () => void;
@@ -26,7 +21,7 @@ export function LocationHeader({
   ].includes(status);
   const isError = status === "error" || status === "permission_denied";
 
-  const handlePress = async () => {
+  const handlePress = () => {
     if (onPress) {
       onPress();
     } else if (onLocationChange) {
@@ -37,96 +32,110 @@ export function LocationHeader({
   const getStatusText = (): string => {
     switch (status) {
       case "requesting_permission":
-        return "Requesting permission...";
+        return "Requesting permission…";
       case "fetching_location":
-        return "Getting your location...";
+        return "Getting your location…";
       case "fetching_address":
-        return "Fetching address...";
+        return "Fetching address…";
       default:
         return "";
     }
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={handlePress}
-      activeOpacity={0.7}
-      className="flex-row items-center px-4 py-3 bg-white"
+      accessibilityRole="button"
+      accessibilityLabel={
+        data
+          ? `Service area: ${data.address.primaryText || "current location"}. Change location`
+          : "Set your location"
+      }
+      className="min-h-12 flex-row items-center gap-3 rounded-card p-4 active:bg-surface-alt"
     >
-      {/* Location Icon */}
-      <View className="w-10 h-10 rounded-full bg-emerald-50 items-center justify-center mr-3">
+      <View className="h-10 w-10 items-center justify-center rounded-pill bg-primary-50">
         {isLoading ? (
-          <ActivityIndicator size="small" color="#10b981" />
+          <ActivityIndicator size="small" color={colors.primary[600]} />
+        ) : isError ? (
+          <LocateFixed size={18} color={colors.danger} strokeWidth={1.75} />
         ) : (
-          <Ionicons
-            name={isError ? "locate-outline" : "location"}
-            size={20}
-            color={isError ? "#ef4444" : "#10b981"}
-          />
+          <MapPin size={18} color={colors.primary[600]} strokeWidth={1.75} />
         )}
       </View>
 
-      {/* Location Text */}
-      <View>
+      <View className="flex-1">
         {isLoading ? (
           <>
-            <Text className="text-sm text-gray-500">Detecting location</Text>
-            <Text className="text-xs text-gray-400 mt-0.5">
+            <Text className="font-sans text-caption text-ink-secondary">
+              Detecting location
+            </Text>
+            <Text className="mt-0.5 font-sans text-caption text-ink-secondary">
               {getStatusText()}
             </Text>
           </>
         ) : isError ? (
           <>
-            <Text className="text-sm font-medium text-red-500">
+            <Text className="text-label font-sans-medium text-ink">
               Location unavailable
             </Text>
-            <Text className="text-xs text-gray-500 mt-0.5">
+            <Text
+              className="mt-0.5 font-sans text-caption text-ink-secondary"
+              numberOfLines={1}
+            >
               {error || "Tap to enable location"}
             </Text>
           </>
         ) : data ? (
           <>
-            <View className="flex-row items-center">
-              <Text className="text-sm text-gray-500">Your location</Text>
-              <Ionicons
-                name="chevron-down"
-                size={14}
-                color="#6b7280"
-                className="ml-1"
-              />
-            </View>
+            <Text className="font-sans text-caption text-ink-secondary">
+              Service area
+            </Text>
             <Text
-              className="text-base font-semibold text-gray-900 mt-0.5"
+              className="mt-0.5 text-body font-sans-medium text-ink"
               numberOfLines={1}
             >
               {data.address.primaryText || "Current Location"}
             </Text>
-            <Text className="text-xs text-gray-500 mt-0.5" numberOfLines={1}>
+            <Text
+              className="font-sans text-caption text-ink-secondary"
+              numberOfLines={1}
+            >
               {data.address.secondaryText || data.address.formattedAddress}
             </Text>
           </>
         ) : (
           <>
-            <Text className="text-sm text-gray-500">Set your location</Text>
-            <Text className="text-xs text-gray-400 mt-0.5">Tap to select</Text>
+            <Text className="text-label font-sans-medium text-ink">
+              Set your location
+            </Text>
+            <Text className="mt-0.5 font-sans text-caption text-ink-secondary">
+              Tap to select
+            </Text>
           </>
         )}
       </View>
 
-      {/* Retry Button for Errors */}
-      {isError && (
+      {isError ? (
         <Pressable
           onPress={refreshLocation}
-          className="px-3 py-2 bg-emerald-500 rounded-lg"
+          accessibilityRole="button"
+          accessibilityLabel="Retry detecting location"
+          hitSlop={12}
+          className="min-h-12 justify-center px-2"
         >
-          <Text className="text-white text-sm font-medium">Retry</Text>
+          <Text className="text-label font-sans-medium text-primary-700">
+            Retry
+          </Text>
         </Pressable>
+      ) : (
+        !isLoading && (
+          <ChevronRight
+            size={18}
+            color={colors.ink.tertiary}
+            strokeWidth={1.75}
+          />
+        )
       )}
-
-      {/* Change arrow for success */}
-      {!isLoading && !isError && data && (
-        <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-      )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }

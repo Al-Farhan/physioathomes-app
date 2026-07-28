@@ -4,51 +4,66 @@ import { LocationPickerModal } from "@/src/components/ui/location/location-picke
 import { useLocation } from "@/src/providers/LocationProvider";
 import { LocationData } from "@/src/types/location";
 import { router } from "expo-router";
+import {
+  Baby,
+  Bone,
+  Brain,
+  Dumbbell,
+  Flower2,
+  HeartPulse,
+  LucideIcon,
+} from "lucide-react-native";
 import React, { useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const servicesData = [
+const servicesData: {
+  id: string;
+  title: string;
+  subtitle: string;
+  Icon: LucideIcon;
+  tags: string[];
+}[] = [
   {
     id: "neuro",
     title: "Neurological Rehab",
     subtitle: "Stroke, Parkinson’s, balance training",
-    gradient: ["#1D2671", "#C33764"],
+    Icon: Brain,
     tags: ["Balance", "Gait", "Strength"],
   },
   {
     id: "ortho",
     title: "Orthopedic Physiotherapy",
     subtitle: "Back pain, knee pain, posture correction",
-    gradient: ["#0F2027", "#2C5364"],
+    Icon: Bone,
     tags: ["Knee", "Back", "Shoulder"],
   },
   {
     id: "sports",
     title: "Sports Injury Treatment",
     subtitle: "Injury recovery & performance mobility",
-    gradient: ["#134E5E", "#71B280"],
+    Icon: Dumbbell,
     tags: ["Mobility", "Recovery", "Performance"],
   },
   {
     id: "pediatric",
     title: "Pediatric Care",
     subtitle: "Development, growth, and behavior",
-    gradient: ["#F7971E", "#FFD200"],
+    Icon: Baby,
     tags: ["Development", "Growth", "Behavior"],
   },
   {
     id: "post-surgery",
     title: "Post-Surgery Recovery",
     subtitle: "Recovery from surgery, joint replacement, and more",
-    gradient: ["#141E30", "#243B55"],
+    Icon: HeartPulse,
     tags: ["Recovery", "Surgery", "Joint Replacement"],
   },
   {
     id: "gynecological",
     title: "Gynecological Care",
     subtitle: "Menstrual health, pelvic floor, and pregnancy",
-    gradient: ["#8E2DE2", "#E94057"],
+    Icon: Flower2,
     tags: ["Menstrual", "Pelvic Floor", "Pregnancy"],
   },
 ];
@@ -62,21 +77,36 @@ const Services = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
       <View className="flex-1">
-        {/* Service area — visits happen at the patient's address */}
-        <LocationHeader onPress={() => setShowLocationPicker(true)} />
         <FlatList
           data={servicesData}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <View className="mb-4">
+              <Text
+                className="text-title font-sans-semibold text-ink"
+                accessibilityRole="header"
+              >
+                Services
+              </Text>
+              <Text className="mt-1 font-sans text-caption text-ink-secondary">
+                Every session happens at your home.
+              </Text>
+              {/* Service area — visits happen at the patient's address */}
+              <View className="mt-4 rounded-card border border-line bg-surface">
+                <LocationHeader onPress={() => setShowLocationPicker(true)} />
+              </View>
+            </View>
+          }
           renderItem={({ item }) => {
             return (
               <ServiceListItem
                 title={item.title}
                 subtitle={item.subtitle}
                 tags={item.tags}
-                gradient={item.gradient}
+                Icon={item.Icon}
                 onPress={() =>
                   router.push({
                     pathname: "/(modals)/service-details",
@@ -87,9 +117,9 @@ const Services = () => {
             );
           }}
           contentContainerStyle={{
-            gap: 10,
-            paddingVertical: 10,
-            paddingHorizontal: 10,
+            gap: 12,
+            paddingVertical: 16,
+            paddingHorizontal: 20,
           }}
         />
       </View>

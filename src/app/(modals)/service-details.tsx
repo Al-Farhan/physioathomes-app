@@ -1,22 +1,34 @@
-import { LinearGradient } from "expo-linear-gradient";
+import { colors } from "@/src/theme/tokens";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import {
+  Baby,
+  Bone,
+  Brain,
+  Check,
+  Dumbbell,
+  Flower2,
+  HeartPulse,
+  LucideIcon,
+  X,
+} from "lucide-react-native";
+import React, { useState } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+// Ids match the services list in app/(user)/services.tsx.
 type ServiceId =
-  | "post-surgery"
+  | "neuro"
+  | "ortho"
+  | "sports"
   | "pediatric"
-  | "orthopedic"
-  | "sports-injury"
+  | "post-surgery"
   | "gynecological";
 
 type ServiceDetails = {
   id: ServiceId;
   title: string;
   subtitle: string;
-  gradient: [string, string];
+  Icon: LucideIcon;
   tags: string[];
   helpsWith: string[];
   goodFor: string[];
@@ -25,11 +37,41 @@ type ServiceDetails = {
 };
 
 const SERVICES: Record<ServiceId, ServiceDetails> = {
+  neuro: {
+    id: "neuro",
+    title: "Neurological Rehab",
+    subtitle: "Regain movement and confidence after neurological events",
+    Icon: Brain,
+    tags: ["Balance", "Gait", "Strength"],
+    helpsWith: [
+      "Balance & coordination",
+      "Gait training",
+      "Strength & endurance",
+      "Daily-activity retraining",
+    ],
+    goodFor: [
+      "Stroke recovery",
+      "Parkinson’s disease",
+      "Multiple sclerosis",
+      "Balance disorders",
+    ],
+    session: {
+      duration: "45 mins",
+      frequency: "3–5 sessions/week",
+      mode: "Home visit",
+    },
+    includes: [
+      "Neurological assessment",
+      "Personalized rehab plan",
+      "Caregiver guidance",
+      "Progress tracking",
+    ],
+  },
   "post-surgery": {
     id: "post-surgery",
     title: "Post-Surgery Recovery",
     subtitle: "Regain mobility and strength safely at home",
-    gradient: ["#141E30", "#243B55"],
+    Icon: HeartPulse,
     tags: ["Mobility", "Pain Relief", "Strength"],
     helpsWith: [
       "Stiffness reduction",
@@ -59,7 +101,7 @@ const SERVICES: Record<ServiceId, ServiceDetails> = {
     id: "pediatric",
     title: "Pediatric Care",
     subtitle: "Therapy for motor milestones and confidence",
-    gradient: ["#F7971E", "#FFD200"],
+    Icon: Baby,
     tags: ["Motor Skills", "Balance", "Growth"],
     helpsWith: [
       "Balance & coordination",
@@ -85,11 +127,11 @@ const SERVICES: Record<ServiceId, ServiceDetails> = {
       "Home activity plan",
     ],
   },
-  orthopedic: {
-    id: "orthopedic",
+  ortho: {
+    id: "ortho",
     title: "Orthopedic Physiotherapy",
     subtitle: "Back, knee, shoulder pain & posture correction",
-    gradient: ["#0F2027", "#2C5364"],
+    Icon: Bone,
     tags: ["Back Pain", "Knee Pain", "Posture"],
     helpsWith: [
       "Pain relief",
@@ -115,11 +157,11 @@ const SERVICES: Record<ServiceId, ServiceDetails> = {
       "Ergonomic guidance",
     ],
   },
-  "sports-injury": {
-    id: "sports-injury",
+  sports: {
+    id: "sports",
     title: "Sports Injury Treatment",
     subtitle: "Recover faster and return stronger",
-    gradient: ["#134E5E", "#71B280"],
+    Icon: Dumbbell,
     tags: ["Recovery", "Performance", "Flexibility"],
     helpsWith: [
       "Injury rehab",
@@ -149,7 +191,7 @@ const SERVICES: Record<ServiceId, ServiceDetails> = {
     id: "gynecological",
     title: "Gynecological Care",
     subtitle: "Women’s health, pelvic floor & postnatal support",
-    gradient: ["#8E2DE2", "#E94057"],
+    Icon: Flower2,
     tags: ["Pelvic Floor", "Postnatal", "Wellness"],
     helpsWith: [
       "Pelvic floor strengthening",
@@ -177,19 +219,17 @@ const SERVICES: Record<ServiceId, ServiceDetails> = {
   },
 };
 
-function Bullet({ text }: { text: string }) {
+function Bullet({ text, checked = false }: { text: string; checked?: boolean }) {
   return (
-    <View style={styles.bulletRow}>
-      <View style={styles.dot} />
-      <Text style={styles.bulletText}>{text}</Text>
-    </View>
-  );
-}
-
-function Chip({ text }: { text: string }) {
-  return (
-    <View style={styles.chip}>
-      <Text style={styles.chipText}>{text}</Text>
+    <View className="flex-row items-start gap-3 py-1.5">
+      {checked ? (
+        <View className="mt-1">
+          <Check size={16} color={colors.primary[600]} strokeWidth={2} />
+        </View>
+      ) : (
+        <View className="mt-2.5 h-1.5 w-1.5 rounded-pill bg-ink-tertiary" />
+      )}
+      <Text className="flex-1 font-sans text-body text-ink">{text}</Text>
     </View>
   );
 }
@@ -202,273 +242,151 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <View style={{ marginTop: 10 }}>{children}</View>
+    <View className="mt-7">
+      <Text
+        className="mb-3 text-label font-sans-medium text-ink-secondary"
+        accessibilityRole="header"
+      >
+        {title}
+      </Text>
+      {children}
     </View>
   );
 }
 
 export default function ServiceDetailsModal() {
   const params = useLocalSearchParams<{ id?: string }>();
-  const id = (params.id ?? "orthopedic") as ServiceId;
-
-  const service = useMemo(() => SERVICES[id] ?? SERVICES.orthopedic, [id]);
+  const id = (params.id ?? "ortho") as ServiceId;
+  const service = SERVICES[id] ?? SERVICES.ortho;
+  const { Icon } = service;
 
   const [ctaState, setCtaState] = useState<"idle" | "loading" | "success">(
     "idle",
   );
 
-  // Press micro-interaction
-  const scale = useSharedValue(1);
-  const btnStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const onBook = async () => {
+  const onBook = () => {
     if (ctaState !== "idle") return;
-
     setCtaState("loading");
-
     // Simulate async booking flow (replace with your API call)
     setTimeout(() => {
       setCtaState("success");
-      // Close modal after success (or route to confirmation screen)
       setTimeout(() => router.back(), 650);
     }, 500);
   };
 
   return (
-    <SafeAreaView style={styles.screen}>
-      {/* Body */}
+    <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
       <ScrollView
-        style={styles.body}
-        contentContainerStyle={{ paddingBottom: 110 }}
+        className="flex-1"
+        contentContainerStyle={{ padding: 20, paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <LinearGradient colors={service.gradient} style={styles.hero}>
-          <View style={styles.heroTopRow}>
-            <Pressable onPress={() => router.back()} style={styles.closeBtn}>
-              <Text style={styles.closeText}>✕</Text>
-            </Pressable>
+        <View className="flex-row items-start justify-between">
+          <View className="h-12 w-12 items-center justify-center rounded-btn bg-primary-50">
+            <Icon size={24} color={colors.primary[700]} strokeWidth={1.75} />
           </View>
+          <Pressable
+            onPress={() => router.back()}
+            accessibilityRole="button"
+            accessibilityLabel="Close"
+            className="h-12 w-12 items-center justify-center"
+          >
+            <X size={22} color={colors.ink.secondary} strokeWidth={1.75} />
+          </Pressable>
+        </View>
 
-          <Text style={styles.heroTitle}>{service.title}</Text>
-          <Text style={styles.heroSubtitle}>{service.subtitle}</Text>
+        <Text className="mt-4 text-title font-sans-semibold text-ink">
+          {service.title}
+        </Text>
+        <Text className="mt-1 font-sans text-body text-ink-secondary">
+          {service.subtitle}
+        </Text>
 
-          <View style={styles.chipsRow}>
-            {service.tags.map((t) => (
-              <Chip key={t} text={t} />
+        <View className="mt-3 flex-row flex-wrap gap-1.5">
+          {service.tags.map((tag) => (
+            <View
+              key={tag}
+              className="rounded-pill border border-line px-2.5 py-1"
+            >
+              <Text className="font-sans text-caption text-ink-secondary">
+                {tag}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <Section title="Helps with">
+          <View className="rounded-card border border-line bg-surface px-4 py-2.5">
+            {service.helpsWith.map((item) => (
+              <Bullet key={item} text={item} />
             ))}
           </View>
-        </LinearGradient>
-        <Section title="Helps With">
-          {service.helpsWith.map((x) => (
-            <Bullet key={x} text={x} />
-          ))}
         </Section>
 
-        <Section title="Good For">
-          {service.goodFor.map((x) => (
-            <Bullet key={x} text={x} />
-          ))}
-        </Section>
-
-        <Section title="Session Details">
-          <View style={styles.sessionGrid}>
-            <View style={styles.sessionItem}>
-              <Text style={styles.sessionLabel}>Duration</Text>
-              <Text style={styles.sessionValue}>
-                {service.session.duration}
-              </Text>
-            </View>
-            <View style={styles.sessionItem}>
-              <Text style={styles.sessionLabel}>Frequency</Text>
-              <Text style={styles.sessionValue}>
-                {service.session.frequency}
-              </Text>
-            </View>
-            <View style={styles.sessionItem}>
-              <Text style={styles.sessionLabel}>Mode</Text>
-              <Text style={styles.sessionValue}>{service.session.mode}</Text>
-            </View>
+        <Section title="Good for">
+          <View className="rounded-card border border-line bg-surface px-4 py-2.5">
+            {service.goodFor.map((item) => (
+              <Bullet key={item} text={item} />
+            ))}
           </View>
         </Section>
 
-        <Section title="What’s Included">
-          {service.includes.map((x) => (
-            <Bullet key={x} text={x} />
-          ))}
+        <Section title="Session details">
+          <View className="flex-row gap-3">
+            {[
+              { label: "Duration", value: service.session.duration },
+              { label: "Frequency", value: service.session.frequency },
+              { label: "Mode", value: service.session.mode },
+            ].map(({ label, value }) => (
+              <View
+                key={label}
+                className="flex-1 rounded-btn bg-surface-alt p-3"
+              >
+                <Text className="font-sans text-caption text-ink-secondary">
+                  {label}
+                </Text>
+                <Text className="mt-1 text-label font-sans-medium text-ink">
+                  {value}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </Section>
+
+        <Section title="What’s included">
+          <View className="rounded-card border border-line bg-surface px-4 py-2.5">
+            {service.includes.map((item) => (
+              <Bullet key={item} text={item} checked />
+            ))}
+          </View>
         </Section>
       </ScrollView>
 
       {/* Sticky CTA */}
-      <View className="absolute bottom-12 w-full items-center">
-        <Pressable style={styles.chip}>
-          <Text style={styles.chipText}>Book Home Session</Text>
+      <View className="border-t border-line p-screen">
+        <Pressable
+          onPress={onBook}
+          disabled={ctaState !== "idle"}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: ctaState !== "idle" }}
+          accessibilityLabel={`Book a home session for ${service.title}`}
+          className={`min-h-12 flex-row items-center justify-center gap-2 rounded-btn ${
+            ctaState === "success" ? "bg-primary-700" : "bg-primary-600"
+          } active:bg-primary-700`}
+        >
+          {ctaState === "success" && (
+            <Check size={18} color={colors.surface.DEFAULT} strokeWidth={2} />
+          )}
+          <Text className="text-body font-sans-semibold text-surface">
+            {ctaState === "idle"
+              ? "Book home session"
+              : ctaState === "loading"
+                ? "Booking…"
+                : "Booked"}
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: "#0B0F14" },
-
-  hero: {
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderRadius: 22,
-    marginBottom: 16,
-    // borderBottomLeftRadius: 22,
-    // borderBottomRightRadius: 22,
-  },
-  heroTopRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 4,
-  },
-  closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.16)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.18)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  closeText: { color: "white", fontSize: 16, fontWeight: "800" },
-
-  heroTitle: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "900",
-    textAlign: "center",
-    marginTop: 4,
-  },
-  heroSubtitle: {
-    color: "rgba(255,255,255,0.88)",
-    textAlign: "center",
-    marginTop: 6,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-
-  chipsRow: {
-    marginTop: 14,
-    flexDirection: "row",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: "rgba(255,255,255,0.16)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.18)",
-  },
-  chipText: {
-    color: "rgba(255,255,255,0.92)",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-
-  body: { flex: 1, paddingHorizontal: 16, paddingTop: 14 },
-
-  section: {
-    backgroundColor: "rgba(255,255,255,0.06)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-    borderRadius: 18,
-    padding: 14,
-    marginBottom: 12,
-  },
-  sectionTitle: { color: "white", fontSize: 14, fontWeight: "900" },
-
-  bulletRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-    marginBottom: 10,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 99,
-    backgroundColor: "rgba(255,255,255,0.8)",
-    marginTop: 7,
-  },
-  bulletText: {
-    flex: 1,
-    color: "rgba(255,255,255,0.86)",
-    fontSize: 13,
-    lineHeight: 18,
-  },
-
-  sessionGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  sessionItem: {
-    flexGrow: 1,
-    flexBasis: "48%",
-    padding: 12,
-    borderRadius: 14,
-    backgroundColor: "rgba(0,0,0,0.18)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-  },
-  sessionLabel: {
-    color: "rgba(255,255,255,0.68)",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  sessionValue: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "900",
-    marginTop: 6,
-  },
-
-  sticky: {
-    position: "absolute",
-    left: 16,
-    right: 0,
-    bottom: 16,
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 14,
-    backgroundColor: "rgba(11,15,20,0.92)",
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.08)",
-  },
-  ctaWrap: { borderRadius: 18 },
-  ctaBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    borderRadius: 18,
-    padding: 14,
-    backgroundColor: "rgba(255,255,255,0.10)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
-  },
-  ctaTitle: { color: "white", fontSize: 15, fontWeight: "900" },
-  ctaSub: {
-    color: "rgba(255,255,255,0.78)",
-    fontSize: 12,
-    marginTop: 4,
-    fontWeight: "700",
-  },
-  ctaAnimBox: {
-    width: 54,
-    height: 54,
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.14)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
