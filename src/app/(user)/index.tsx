@@ -1,308 +1,217 @@
-import ServiceListItemHome from "@/src/components/ServiceListItemHome";
 import Skeleton from "@/src/components/skeleton/skeleton";
-import { LocationHeader } from "@/src/components/ui/location/location-header";
-import { LocationPickerModal } from "@/src/components/ui/location/location-picker-modal";
+import { HelpStrip } from "@/src/components/home/help-strip";
+import { HomeHeader } from "@/src/components/home/home-header";
+import { HomeSkeleton } from "@/src/components/home/home-skeleton";
+import { NextSessionCard } from "@/src/components/home/next-session-card";
+import { OfflineBanner } from "@/src/components/home/offline-banner";
+import { QuickActions, QuickActionKey } from "@/src/components/home/quick-actions";
+import { RecoveryProgressCard } from "@/src/components/home/recovery-progress-card";
+import { SectionError } from "@/src/components/home/section-error";
+import { TherapistCard } from "@/src/components/home/therapist-card";
+import { TodaysExercises } from "@/src/components/home/todays-exercises";
+import { useHomeData } from "@/src/hooks/use-home-data";
+import { greetingForHour } from "@/src/lib/format";
+import { setExerciseDone } from "@/src/lib/mock/home";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { useLocation } from "@/src/providers/LocationProvider";
-import { LocationData } from "@/src/types/location";
-import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
+import { colors } from "@/src/theme/tokens";
+import type { SectionState } from "@/src/types/home";
+import { useRouter } from "expo-router";
+import React, { useCallback } from "react";
+import { Linking, RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type IconName = React.ComponentProps<typeof Ionicons>["name"];
-
-const services = [
-  "Neurological Rehab",
-  "Post-Surgery Recovery",
-  "Pediatric Care",
-  "Orthopedic Physiotherapy",
-  "Sports Injury Treatment",
-  "Gynecological Care",
-];
-
-const features: Array<{
-  icon: IconName;
-  title: string;
-  description: string;
-}> = [
-  {
-    icon: "person-outline",
-    title: "Expert Therapists",
-    description:
-      "We match you with a physiotherapist whose expertise best suits your specific condition.",
-  },
-  {
-    icon: "home-outline",
-    title: "Care Where You Need It Most",
-    description:
-      "We provide treatment in the comfort of your own environment, ensuring healing when travel isn't possible.",
-  },
-  {
-    icon: "shield-outline",
-    title: "Tailored Recovery Plans",
-    description:
-      "Every session is carefully designed to match your medical requirements and recovery goals.",
-  },
-  {
-    icon: "people-outline",
-    title: "Addressing the Root Cause",
-    description:
-      "We focus on long-term healing by treating the underlying issue, not just easing the discomfort.",
-  },
-];
-
+/**
+ * Home. Composes presentational sections only — all data flows in from
+ * useHomeData (mock-backed, swappable) and the auth session.
+ */
 export default function HomeScreen() {
-  const { status, refreshLocation, setLocationData } = useLocation();
-  const { loading, session } = useAuth();
-  const ctaButtonRotation = useSharedValue<number>(0);
-  const [user, setUser] = useState<any>(null);
-  const [userIcon, setUserIcon] = useState("G");
-  const [isRefreshingLocation, setIsRefreshingLocation] = useState(false);
-  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const router = useRouter();
+  const { session } = useAuth();
+  const home = useHomeData();
 
-  const rotationDuration = 2000;
-  const easing = Easing.elastic(1.5);
-  const ANGLE = 5;
-  const TIME = 1000;
+  const sessionFirstName: string | undefined =
+    session?.user?.user_metadata?.fullName?.split(" ")[0];
+  const firstName = sessionFirstName ?? home.user.data?.firstName ?? "there";
+  const greeting = greetingForHour(new Date().getHours());
 
-  const isLoadingLocation = [
-    "requesting_permission",
-    "fetching_location",
-    "fetching_address",
-  ].includes(status);
-
-  const handleLocationSelect = (location: LocationData) => {
-    // Handle the selected location
-    // You might want to update your context or state here
-    console.log("Selected location:", location);
-    setLocationData(location);
-  };
-
-  const handleRefresh = async () => {
-    setIsRefreshingLocation(true);
-    await refreshLocation();
-    setIsRefreshingLocation(false);
-  };
-
-  useEffect(() => {
-    if (session) {
-      setUser(session?.user?.user_metadata);
-
-      const userName = session?.user?.user_metadata?.fullName;
-      if (userName) {
-        const [firstLetter, lastLetter] = userName.split(" ");
-        setUserIcon(`${firstLetter[0]}${lastLetter[0]}`);
+  const handleQuickAction = useCallback(
+    (key: QuickActionKey) => {
+      switch (key) {
+        case "book":
+          router.push("/(user)/services");
+          break;
+        case "exercises":
+          // TODO: exercises screen not built yet
+          break;
+        case "reports":
+          router.push("/user-activity");
+          break;
+        case "support":
+          router.push("/help");
+          break;
       }
-    }
-  }, [session]);
+    },
+    [router],
+  );
 
-  useEffect(() => {
-    ctaButtonRotation.value = withRepeat(
-      withSequence(
-        withTiming(-ANGLE, { duration: TIME / 2, easing }),
-        withRepeat(withTiming(ANGLE, { duration: TIME, easing }), -1, true),
-        withTiming(0, { duration: TIME / 2, easing })
-      )
-    );
-  }, []);
+  const handleToggleExercise = useCallback(
+    (id: string, done: boolean) => {
+      home.setExercises((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, done } : e)),
+      );
+      setExerciseDone(id, done).catch(() => {
+        home.setExercises((prev) =>
+          prev.map((e) => (e.id === id ? { ...e, done: !done } : e)),
+        );
+      });
+    },
+    [home],
+  );
 
-  const ctaButtonAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotateZ: `${ctaButtonRotation.value}deg` }],
-  }));
-
-  if (loading) {
+  if (home.initialLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
-        <View className="p-4 gap-y-4">
-          <View className="flex-row items-center justify-between">
-            <Skeleton variant="circle" className="w-10 h-10 my-2" />
-            <Skeleton variant="box" className="w-40 h-10" />
-          </View>
-          <View>
-            <Skeleton className="w-full h-10" />
-          </View>
-          <View className="flex-row flex-wrap gap-2 justify-center items-center">
-            <Skeleton className="w-48 h-32" />
-            <Skeleton className="w-48 h-32" />
-            <Skeleton className="w-48 h-32" />
-            <Skeleton className="w-48 h-32" />
-            <Skeleton className="w-48 h-32" />
-            <Skeleton className="w-48 h-32" />
-          </View>
-          <View className="gap-y-4">
-            <Skeleton className="w-full h-40" />
-            <Skeleton className="w-full h-40" />
-          </View>
-        </View>
+      <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
+        <HomeSkeleton />
       </SafeAreaView>
     );
   }
 
+  const noUpcomingSession =
+    home.nextSession.status === "success" && home.nextSession.data === null;
+
+  const nextSessionSection = renderSection(home.nextSession, {
+    skeletonHeight: "h-56",
+    errorMessage: "Couldn’t load your next session.",
+    onRetry: home.retryNextSession,
+    render: (nextSession) => (
+      <NextSessionCard
+        session={nextSession}
+        onCallTherapist={() => {
+          if (nextSession)
+            Linking.openURL(`tel:${nextSession.therapist.phone}`);
+        }}
+        onTrack={() => {
+          // TODO: live tracking screen not built yet
+        }}
+        onReschedule={() => {
+          // TODO: reschedule flow not built yet
+        }}
+        onBook={() => router.push("/(user)/services")}
+      />
+    ),
+  });
+
+  const recoverySection = renderSection(home.recovery, {
+    skeletonHeight: "h-32",
+    errorMessage: "Couldn’t load your recovery progress.",
+    onRetry: home.retryRecovery,
+    render: (recovery) =>
+      recovery && (
+        <RecoveryProgressCard
+          recovery={recovery}
+          onPress={() => {
+            // TODO: care plan screen not built yet
+          }}
+        />
+      ),
+  });
+
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
+      {home.isOffline && <OfflineBanner />}
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 80 }}
+        contentContainerStyle={{ paddingBottom: 40 }}
         refreshControl={
           <RefreshControl
-            refreshing={isRefreshingLocation}
-            onRefresh={handleRefresh}
-            tintColor="#10b981"
+            refreshing={home.refreshing}
+            onRefresh={home.refresh}
+            tintColor={colors.primary[600]}
           />
         }
       >
-        <View className="flex-row items-center justify-between">
-          {/* User Icon and Name */}
-          {session ? (
-            <Link href="/(user)/profile" asChild>
-              <Pressable className="px-4" android_ripple={{ color: "gray" }}>
-                <View className="flex-row items-center gap-2">
-                  <View className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center">
-                    <Text className="text-xl text-center">{userIcon}</Text>
-                  </View>
-                  <Text className="text-lg font-medium text-gray-700">
-                    {user?.fullName}
-                  </Text>
-                </View>
-              </Pressable>
-            </Link>
-          ) : (
-            <View className="px-4">
-              <View className="flex-row items-center gap-2">
-                <View className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center">
-                  <Text className="text-xl text-center">G</Text>
-                </View>
-                <Text className="text-lg font-medium text-gray-700">Guest</Text>
-              </View>
-            </View>
-          )}
-
-          {/* Location Header */}
-          {isLoadingLocation ? (
-            <ActivityIndicator />
-          ) : (
-            <LocationHeader onPress={() => setShowLocationPicker(true)} />
-          )}
-        </View>
-
-        {/* Hero Section */}
-        <View className="flex w-full px-4">
-          {/* Search */}
-          <View className="w-full py-2 mb-4">
-            <View className="rounded-md">
-              <View className="relative">
-                <Ionicons
-                  name="search"
-                  size={18}
-                  color={"gray"}
-                  style={{ position: "absolute", left: 12, top: 13, zIndex: 1 }}
-                />
-                <TextInput
-                  placeholder="Search"
-                  placeholderTextColor={"gray"}
-                  className="border rounded-md p-2 py-4 pl-10"
-                />
-              </View>
-            </View>
-          </View>
-
-          {/* Hero content */}
-          <FlatList
-            data={services}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => {
-              return <ServiceListItemHome item={item} />;
+        <View className="gap-section px-screen pb-2 pt-2">
+          <HomeHeader
+            greeting={greeting}
+            firstName={firstName}
+            avatarUrl={home.user.data?.avatarUrl ?? null}
+            hasUnreadNotifications={(home.user.data?.unreadNotifications ?? 0) > 0}
+            onPressNotifications={() => {
+              // TODO: notifications screen not built yet
             }}
-            numColumns={2}
-            scrollEnabled={false}
-            contentContainerStyle={{ gap: 10, paddingVertical: 10 }} // Style between rows
-            columnWrapperStyle={{ gap: 10 }}
+            onPressProfile={() => router.push("/(user)/profile")}
           />
-        </View>
 
-        {/* Home body */}
-        <View className="px-4 mt-4 w-full">
-          {/* Why choose us */}
-          <View className="">
-            {features.map((item, index) => (
-              <View
-                key={index}
-                className="bg-gray-100 p-2 py-4 mt-2 rounded-md flex-1 items-center"
-              >
-                <Ionicons name={item.icon} size={30} />
-                <Text className="text-center text-lg font-medium">
-                  {item.title}
-                </Text>
-                <Text className="text-center px-4 text-gray-700">
-                  {item.description}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
+          {/* Hero: next session, or the booking prompt when there's none.
+              With no upcoming session, booking is already promoted above
+              progress by keeping this section first. */}
+          {nextSessionSection}
 
-        {/* Small videos auto play */}
-        <View className="px-4 mt-4 w-full">
-          <Text className="text-md mb-2 text-gray-700">
-            Real lives, real impact
-          </Text>
-          <FlatList
-            data={[1, 2, 3, 4]}
-            horizontal
-            contentContainerStyle={{ gap: 10 }}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => {
-              return (
-                <View className="bg-black rounded-md w-48 h-72">
-                  <Text>{item}</Text>
-                </View>
-              );
-            }}
-          />
+          {!noUpcomingSession && recoverySection}
+
+          <QuickActions onPressAction={handleQuickAction} />
+
+          {noUpcomingSession && recoverySection}
+
+          {renderSection(home.exercises, {
+            skeletonHeight: "h-40",
+            errorMessage: "Couldn’t load today’s exercises.",
+            onRetry: home.retryExercises,
+            render: (exercises) => (
+              <TodaysExercises
+                exercises={exercises}
+                onToggleDone={handleToggleExercise}
+                onViewAll={() => {
+                  // TODO: exercises screen not built yet
+                }}
+              />
+            ),
+          })}
+
+          {renderSection(home.therapist, {
+            skeletonHeight: "h-40",
+            errorMessage: "Couldn’t load your physiotherapist.",
+            onRetry: home.retryTherapist,
+            render: (therapist) =>
+              therapist && (
+                <TherapistCard
+                  therapist={therapist}
+                  onMessage={() => Linking.openURL(`sms:${therapist.phone}`)}
+                  onCall={() => Linking.openURL(`tel:${therapist.phone}`)}
+                />
+              ),
+          })}
+
+          <HelpStrip onPress={() => router.push("/help")} />
         </View>
       </ScrollView>
-
-      {/* Bottom floating Button */}
-      <View className="absolute bottom-2 w-full items-center">
-        {/* <Button
-          text="Book now"
-          onPress={() => console.info("Book now button pressed")}
-        /> */}
-        <Animated.View style={ctaButtonAnimatedStyle}>
-          <Pressable
-            onPress={() => console.info("Book now pressed")}
-            className="bg-[rgba(255,255,255,0.16)] border border-[rgba(255, 255, 255, 0.18)] px-8 py-4 rounded-md"
-          >
-            <Text className="text-lg">Book now</Text>
-          </Pressable>
-        </Animated.View>
-      </View>
-
-      <LocationPickerModal
-        visible={showLocationPicker}
-        onClose={() => setShowLocationPicker(false)}
-        onSelectLocation={handleLocationSelect}
-      />
     </SafeAreaView>
+  );
+}
+
+/**
+ * Shared per-section state handling: stale data keeps rendering during
+ * reloads; a section-local skeleton covers retries; errors stay inline.
+ */
+function renderSection<T>(
+  state: SectionState<T>,
+  options: {
+    skeletonHeight: string;
+    errorMessage: string;
+    onRetry: () => void;
+    render: (data: T) => React.ReactNode;
+  },
+): React.ReactNode {
+  if (state.data !== undefined) return options.render(state.data);
+  if (state.status === "error")
+    return (
+      <SectionError message={options.errorMessage} onRetry={options.onRetry} />
+    );
+  return (
+    <Skeleton
+      variant="box"
+      className={`w-full rounded-card ${options.skeletonHeight}`}
+    />
   );
 }

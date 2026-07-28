@@ -1,10 +1,22 @@
+const {
+  colors,
+  fontSize,
+  spacing,
+  borderRadius,
+} = require("./src/theme/tokens.ts");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   // NOTE: Update this to include the paths to all files that contain Nativewind classes.
   content: ["./App.tsx", "./src/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      colors,
+      fontSize,
+      spacing,
+      borderRadius,
+    },
   },
   plugins: [],
 };
