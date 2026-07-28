@@ -1,7 +1,7 @@
 import { View } from "react-native";
 
 const HorizontalLine = () => {
-  return <View className="h-px bg-gray-200 w-full" />;
+  return <View className="h-px w-full bg-line" />;
 };
 
 export default HorizontalLine;

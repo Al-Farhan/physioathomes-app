@@ -1,6 +1,6 @@
+import TransactionsListItem from "@/src/components/ui/profile/transactions-list-item";
 import React from "react";
 import { FlatList, Text, View } from "react-native";
-import TransactionsListItem from "../components/ui/profile/transactions-list-item";
 
 const TRANSACTIONS = [
   {
@@ -29,12 +29,37 @@ const TRANSACTIONS = [
 
 const UserPayments = () => {
   return (
-    <View className="flex-1 bg-white p-4">
-      <Text className="text-lg">Transactions</Text>
-
+    <View className="flex-1 bg-surface">
       <FlatList
         data={TRANSACTIONS}
-        renderItem={({ item }) => <TransactionsListItem item={item} />}
+        keyExtractor={(item) => String(item.id)}
+        contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+        ListHeaderComponent={
+          <Text
+            className="mb-3 text-label font-sans-medium text-ink-secondary"
+            accessibilityRole="header"
+          >
+            Transactions
+          </Text>
+        }
+        renderItem={({ item, index }) => (
+          <View
+            className={`border-x border-line bg-surface ${
+              index === 0 ? "rounded-t-card border-t" : ""
+            } ${
+              index === TRANSACTIONS.length - 1
+                ? "rounded-b-card border-b"
+                : ""
+            }`}
+          >
+            <TransactionsListItem item={item} divider={index > 0} />
+          </View>
+        )}
+        ListEmptyComponent={
+          <Text className="font-sans text-body text-ink-secondary">
+            No transactions yet.
+          </Text>
+        }
       />
     </View>
   );

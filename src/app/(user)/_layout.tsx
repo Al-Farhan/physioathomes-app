@@ -2,15 +2,24 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { HapticTab } from "@/src/components/haptic-tab";
+import { colors } from "@/src/theme/tokens";
 import { Grip, House, User } from "lucide-react-native";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#000",
+        tabBarActiveTintColor: colors.primary[600],
+        tabBarInactiveTintColor: colors.ink.tertiary,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: {
+          backgroundColor: colors.surface.DEFAULT,
+          borderTopColor: colors.line,
+        },
+        tabBarLabelStyle: {
+          fontFamily: "Inter_500Medium",
+        },
       }}
     >
       <Tabs.Screen

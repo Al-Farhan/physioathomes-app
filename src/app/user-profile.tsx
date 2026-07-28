@@ -1,3 +1,5 @@
+import Button from "@/src/components/ui/Button";
+import { colors } from "@/src/theme/tokens";
 import { ChevronDown, CircleUserRound } from "lucide-react-native";
 import React, { useState } from "react";
 import {
@@ -12,69 +14,90 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const GENDER_OPTIONS = ["Male", "Female", "Others"] as const;
 
+type FieldProps = {
+  id: string;
+  label: string;
+  placeholder?: string;
+};
+
+const Field = ({ id, label, placeholder }: FieldProps) => (
+  <View>
+    <Text nativeID={id} className="mb-2 text-label font-sans-medium text-ink">
+      {label}
+    </Text>
+    <TextInput
+      accessibilityLabelledBy={id}
+      className="min-h-12 rounded-btn border border-line bg-surface px-4 font-sans text-body text-ink focus:border-primary-600"
+      placeholder={placeholder}
+      placeholderTextColor={colors.ink.tertiary}
+    />
+  </View>
+);
+
 const UserProfile = () => {
   const [gender, setGender] = useState<string>("");
   const [showGenderPicker, setShowGenderPicker] = useState<boolean>(false);
 
   return (
-    <SafeAreaView className={`flex-1 bg-white`}>
+    <SafeAreaView className="flex-1 bg-surface" edges={["bottom"]}>
       <ScrollView
-        className="p-4 bg-white"
-        contentContainerStyle={{ paddingBottom: 80 }}
+        className="flex-1"
+        contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Profile Picture */}
         <View className="items-center justify-center">
-          <CircleUserRound size={100} color="gray" strokeWidth={1} />
-          <Text className="text-gray-500 text-sm">ADD PICTURE</Text>
+          <CircleUserRound
+            size={96}
+            color={colors.ink.tertiary}
+            strokeWidth={1}
+          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Add profile picture"
+            hitSlop={8}
+            className="min-h-12 justify-center px-4"
+          >
+            <Text className="text-label font-sans-medium text-primary-700">
+              Add photo
+            </Text>
+          </Pressable>
         </View>
 
         {/* User details */}
-        <View className="mt-12 gap-y-6">
-          {/* Full Name */}
+        <View className="mt-6 gap-5">
+          <Field id="full-name" label="Full name *" />
+          <Field id="phone-number" label="Phone number *" />
+          <Field id="email" label="Email *" />
+
+          {/* Gender picker */}
           <View>
-            <Text nativeID="full-name" className="text-gray-500 text-sm">
-              Full Name *
-            </Text>
-            <TextInput
-              accessibilityLabelledBy={"full-name"}
-              className="border-b py-1 text-lg border-gray-300 focus:border-black"
-            />
-          </View>
-          {/* Phone Number */}
-          <View>
-            <Text nativeID="phone-number" className="text-gray-500 text-sm">
-              Phone Number *
-            </Text>
-            <TextInput
-              accessibilityLabelledBy={"phone-number"}
-              className="border-b py-1 text-lg border-gray-300 focus:border-black"
-            />
-          </View>
-          {/* Email */}
-          <View>
-            <Text nativeID="email" className="text-gray-500 text-sm">
-              Email *
-            </Text>
-            <TextInput
-              accessibilityLabelledBy={"email"}
-              className="border-b py-1 text-lg border-gray-300 focus:border-black"
-            />
-          </View>
-          {/* Gender picker start */}
-          <View>
-            <Text nativeID="gender" className="text-gray-500 text-sm">
+            <Text
+              nativeID="gender"
+              className="mb-2 text-label font-sans-medium text-ink"
+            >
               Gender
             </Text>
             <Pressable
               onPress={() => setShowGenderPicker(true)}
-              className="border-b py-1 border-gray-300 flex-row items-center justify-between"
+              accessibilityRole="button"
+              accessibilityLabel={
+                gender ? `Gender: ${gender}. Change` : "Select gender"
+              }
+              className="min-h-12 flex-row items-center justify-between rounded-btn border border-line bg-surface px-4 active:bg-surface-alt"
             >
               <Text
-                className={`${gender ? "text-black text-lg" : "text-gray-400 text-sm"}`}
+                className={`font-sans text-body ${
+                  gender ? "text-ink" : "text-ink-tertiary"
+                }`}
               >
-                {gender || "Select Gender"}
+                {gender || "Select gender"}
               </Text>
-              <ChevronDown size={20} color="gray" />
+              <ChevronDown
+                size={18}
+                color={colors.ink.secondary}
+                strokeWidth={1.75}
+              />
             </Pressable>
 
             <Modal
@@ -84,13 +107,13 @@ const UserProfile = () => {
               onRequestClose={() => setShowGenderPicker(false)}
             >
               <Pressable
-                className="flex-1 bg-black/50 justify-end"
+                className="flex-1 justify-end bg-ink/40"
                 onPress={() => setShowGenderPicker(false)}
               >
-                <View className="bg-white rounded-t-2xl">
-                  <View className="p-4 border-b border-gray-200">
-                    <Text className="text-lg font-semibold text-center">
-                      Select Gender
+                <View className="rounded-t-card bg-surface pb-6">
+                  <View className="border-b border-line p-4">
+                    <Text className="text-center text-body font-sans-semibold text-ink">
+                      Select gender
                     </Text>
                   </View>
                   {GENDER_OPTIONS.map((option) => (
@@ -100,13 +123,18 @@ const UserProfile = () => {
                         setGender(option);
                         setShowGenderPicker(false);
                       }}
-                      className={`p-4 border-b border-gray-100 ${
-                        gender === option ? "bg-gray-100" : ""
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: gender === option }}
+                      accessibilityLabel={option}
+                      className={`min-h-12 justify-center border-b border-line px-4 ${
+                        gender === option ? "bg-primary-50" : ""
                       }`}
                     >
                       <Text
-                        className={`text-lg text-center ${
-                          gender === option ? "font-semibold" : ""
+                        className={`text-center text-body ${
+                          gender === option
+                            ? "font-sans-medium text-primary-700"
+                            : "font-sans text-ink"
                         }`}
                       >
                         {option}
@@ -115,9 +143,11 @@ const UserProfile = () => {
                   ))}
                   <Pressable
                     onPress={() => setShowGenderPicker(false)}
-                    className="p-4 mb-4"
+                    accessibilityRole="button"
+                    accessibilityLabel="Cancel"
+                    className="min-h-12 justify-center px-4"
                   >
-                    <Text className="text-lg text-center text-gray-500">
+                    <Text className="text-center text-body font-sans text-ink-secondary">
                       Cancel
                     </Text>
                   </Pressable>
@@ -125,67 +155,22 @@ const UserProfile = () => {
               </Pressable>
             </Modal>
           </View>
-          {/* Gender picker end */}
 
-          {/* Address line 1 */}
-          <View>
-            <Text nativeID="address-line-1" className="text-gray-500 text-sm">
-              Address Line 1 *
-            </Text>
-            <TextInput
-              accessibilityLabelledBy={"address-line-1"}
-              className="border-b py-1 text-lg border-gray-300 focus:border-black placeholder:text-gray-400"
-              placeholder="Building Name, Room No., Street Name, etc."
-            />
-          </View>
-          {/* Address line 2 */}
-          <View>
-            <Text nativeID="address-line-2" className="text-gray-500 text-sm">
-              Address Line 2
-            </Text>
-            <TextInput
-              accessibilityLabelledBy={"address-line-2"}
-              className="border-b py-1 text-lg border-gray-300 focus:border-black"
-            />
-          </View>
-          {/* City */}
-          <View>
-            <Text nativeID="city" className="text-gray-500 text-sm">
-              City *
-            </Text>
-            <TextInput
-              accessibilityLabelledBy={"city"}
-              className="border-b py-1 text-lg border-gray-300 focus:border-black"
-            />
-          </View>
-          {/* State */}
-          <View>
-            <Text nativeID="state" className="text-gray-500 text-sm">
-              State *
-            </Text>
-            <TextInput
-              accessibilityLabelledBy={"state"}
-              className="border-b py-1 text-lg border-gray-300 focus:border-black"
-            />
-          </View>
-          {/* Pin Code */}
-          <View>
-            <Text nativeID="pin-code" className="text-gray-500 text-sm">
-              Pin Code *
-            </Text>
-            <TextInput
-              accessibilityLabelledBy={"pin-code"}
-              className="border-b py-1 text-lg border-gray-300 focus:border-black"
-            />
-          </View>
+          <Field
+            id="address-line-1"
+            label="Address line 1 *"
+            placeholder="Building name, room no., street name"
+          />
+          <Field id="address-line-2" label="Address line 2" />
+          <Field id="city" label="City *" />
+          <Field id="state" label="State *" />
+          <Field id="pin-code" label="Pin code *" />
         </View>
       </ScrollView>
 
-      {/* Sticky Footer Save Button */}
-      <View className="p-4 bg-white border-t border-gray-200">
-        <Pressable className="bg-black p-4 rounded-lg items-center">
-          <Text className="text-white font-semibold text-lg">Save</Text>
-        </Pressable>
+      {/* Sticky footer save button */}
+      <View className="border-t border-line bg-surface p-screen">
+        <Button text="Save" accessibilityLabel="Save profile" />
       </View>
     </SafeAreaView>
   );
