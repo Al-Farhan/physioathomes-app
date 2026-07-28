@@ -27,7 +27,7 @@ export function Avatar({ name, photoUrl, size = 40 }: AvatarProps) {
   return (
     <View className="items-center justify-center bg-primary-50" style={style}>
       <Text
-        className="font-semibold text-primary-700"
+        className="font-sans-semibold text-primary-700"
         style={{ fontSize: size * 0.35 }}
       >
         {initialsOf(name)}

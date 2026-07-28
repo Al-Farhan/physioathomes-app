@@ -11,7 +11,7 @@ export function SectionTitle({ title, action }: SectionTitleProps) {
   return (
     <View className="mb-3 flex-row items-center justify-between">
       <Text
-        className="text-label font-medium text-ink-secondary"
+        className="text-label font-sans-medium text-ink-secondary"
         accessibilityRole="header"
       >
         {title}

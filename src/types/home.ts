@@ -48,6 +48,53 @@ export interface HomeUser {
   unreadNotifications: number;
 }
 
+export interface NotificationItem {
+  id: string;
+  title: string;
+  body: string;
+  /** ISO datetime */
+  createdAt: string;
+  read: boolean;
+}
+
+export type MilestoneStatus = "done" | "current" | "upcoming";
+
+export interface Milestone {
+  id: string;
+  title: string;
+  detail?: string;
+  status: MilestoneStatus;
+}
+
+export interface CarePlan {
+  conditionName: string;
+  /** ISO date */
+  startedOn: string;
+  sessionsCompleted: number;
+  sessionsPlanned: number;
+  therapistNote: string;
+  milestones: Milestone[];
+}
+
+export interface RescheduleSlot {
+  id: string;
+  /** ISO datetime */
+  startsAt: string;
+  available: boolean;
+}
+
+export interface RescheduleDay {
+  /** ISO date (start of day) */
+  date: string;
+  slots: RescheduleSlot[];
+}
+
+export interface TrackingInfo {
+  session: UpcomingSession | null;
+  /** minutes until arrival; null unless the therapist is on the way */
+  etaMinutes: number | null;
+}
+
 /**
  * Per-section async state. `data` is kept through reloads so pull-to-refresh
  * and inline retries never blank out content the user is already reading.

@@ -1,5 +1,4 @@
 import {
-  MOCK_CONFIG,
   fetchAssignedTherapist,
   fetchHomeUser,
   fetchNextSession,
@@ -22,6 +21,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useIsOffline } from "./use-is-offline";
 
 /**
  * Loads each Home section independently so one failing request degrades to an
@@ -91,6 +91,7 @@ export function useHomeData(): HomeData {
   );
   const [therapist, retryTherapist] = useSection(fetchAssignedTherapist);
   const [refreshing, setRefreshing] = useState(false);
+  const isOffline = useIsOffline();
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -124,7 +125,7 @@ export function useHomeData(): HomeData {
     exercises,
     therapist,
     initialLoading,
-    isOffline: MOCK_CONFIG.offline,
+    isOffline,
     refreshing,
     refresh,
     retryNextSession,

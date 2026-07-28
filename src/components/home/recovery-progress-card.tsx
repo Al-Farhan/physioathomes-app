@@ -32,7 +32,7 @@ export function RecoveryProgressCard({
         className="rounded-card border border-line bg-surface p-5 active:bg-surface-alt"
       >
         <View className="flex-row items-center justify-between gap-3">
-          <Text className="flex-1 text-body font-medium text-ink">
+          <Text className="flex-1 text-body font-sans-medium text-ink">
             {conditionName}
           </Text>
           <ChevronRight
@@ -50,10 +50,13 @@ export function RecoveryProgressCard({
         </View>
 
         <View className="mt-3 flex-row items-center justify-between gap-3">
-          <Text className="text-caption text-ink-secondary">
+          <Text className="font-sans text-caption text-ink-secondary">
             {sessionsCompleted} of {sessionsPlanned} sessions completed
           </Text>
-          <Text className="text-caption text-ink-secondary" numberOfLines={1}>
+          <Text
+            className="font-sans text-caption text-ink-secondary"
+            numberOfLines={1}
+          >
             Next: {nextMilestone}
           </Text>
         </View>

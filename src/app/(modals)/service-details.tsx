@@ -1,22 +1,9 @@
-import { LOTTIE } from "@/src/assets/lottie";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import LottieView from "lottie-react-native";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const LOTTIES = {
-  "post-surgery": LOTTIE.cylinder,
-  pediatric: LOTTIE.cylinder,
-  orthopedic: LOTTIE.cylinder,
-  "sports-injury": LOTTIE.cylinder,
-  gynecological: LOTTIE.cylinder,
-
-  // CTA animation
-  ctaSuccess: LOTTIE.cylinder,
-};
 
 type ServiceId =
   | "post-surgery"
@@ -228,9 +215,6 @@ export default function ServiceDetailsModal() {
 
   const service = useMemo(() => SERVICES[id] ?? SERVICES.orthopedic, [id]);
 
-  const heroRef = useRef<LottieView>(null);
-  const ctaRef = useRef<LottieView>(null);
-
   const [ctaState, setCtaState] = useState<"idle" | "loading" | "success">(
     "idle",
   );
@@ -245,9 +229,6 @@ export default function ServiceDetailsModal() {
     if (ctaState !== "idle") return;
 
     setCtaState("loading");
-    // Optional: play a short success animation right away
-    ctaRef.current?.reset();
-    ctaRef.current?.play();
 
     // Simulate async booking flow (replace with your API call)
     setTimeout(() => {
@@ -272,14 +253,6 @@ export default function ServiceDetailsModal() {
               <Text style={styles.closeText}>✕</Text>
             </Pressable>
           </View>
-
-          <LottieView
-            ref={heroRef}
-            source={LOTTIES[service.id]}
-            autoPlay
-            loop
-            style={styles.heroLottie}
-          />
 
           <Text style={styles.heroTitle}>{service.title}</Text>
           <Text style={styles.heroSubtitle}>{service.subtitle}</Text>
@@ -368,7 +341,6 @@ const styles = StyleSheet.create({
   },
   closeText: { color: "white", fontSize: 16, fontWeight: "800" },
 
-  heroLottie: { width: 170, height: 170, alignSelf: "center" },
   heroTitle: {
     color: "white",
     fontSize: 18,

@@ -35,7 +35,7 @@ export function QuickActions({ onPressAction }: QuickActionsProps) {
         >
           <Icon size={22} color={colors.primary[700]} strokeWidth={1.75} />
           <Text
-            className="text-center text-caption font-medium text-ink"
+            className="text-center text-caption font-sans-medium text-ink"
             numberOfLines={2}
           >
             {label}

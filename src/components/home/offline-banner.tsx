@@ -11,7 +11,7 @@ export function OfflineBanner() {
       accessibilityRole="alert"
     >
       <WifiOff size={16} color={colors.ink.secondary} strokeWidth={1.75} />
-      <Text className="text-caption text-ink-secondary">
+      <Text className="font-sans text-caption text-ink-secondary">
         You’re offline — showing saved information.
       </Text>
     </View>

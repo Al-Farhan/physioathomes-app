@@ -25,15 +25,15 @@ export function TherapistCard({
         <View className="flex-row items-center gap-4">
           <Avatar name={therapist.name} photoUrl={therapist.photoUrl} size={56} />
           <View className="flex-1">
-            <Text className="text-body font-semibold text-ink">
+            <Text className="text-body font-sans-semibold text-ink">
               {therapist.name}
             </Text>
-            <Text className="text-caption text-ink-secondary">
+            <Text className="font-sans text-caption text-ink-secondary">
               {therapist.credentials} · {therapist.specialization}
             </Text>
             <View className="mt-1 flex-row items-center gap-1">
               <Star size={14} color={colors.warning} strokeWidth={1.75} />
-              <Text className="text-caption font-medium text-ink-secondary">
+              <Text className="text-caption font-sans-medium text-ink-secondary">
                 {therapist.rating.toFixed(1)}
               </Text>
             </View>
@@ -52,7 +52,7 @@ export function TherapistCard({
               color={colors.ink.DEFAULT}
               strokeWidth={1.75}
             />
-            <Text className="text-body font-medium text-ink">Message</Text>
+            <Text className="text-body font-sans-medium text-ink">Message</Text>
           </Pressable>
           <Pressable
             onPress={onCall}
@@ -61,7 +61,7 @@ export function TherapistCard({
             className="min-h-12 flex-1 flex-row items-center justify-center gap-2 rounded-btn border border-line bg-surface active:bg-surface-alt"
           >
             <Phone size={18} color={colors.ink.DEFAULT} strokeWidth={1.75} />
-            <Text className="text-body font-medium text-ink">Call</Text>
+            <Text className="text-body font-sans-medium text-ink">Call</Text>
           </Pressable>
         </View>
       </View>

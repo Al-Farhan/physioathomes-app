@@ -24,8 +24,10 @@ export function HomeHeader({
   return (
     <View className="flex-row items-center justify-between">
       <View>
-        <Text className="text-caption text-ink-secondary">{greeting},</Text>
-        <Text className="text-title font-semibold text-ink">{firstName}</Text>
+        <Text className="font-sans text-caption text-ink-secondary">
+          {greeting},
+        </Text>
+        <Text className="text-title font-sans-semibold text-ink">{firstName}</Text>
       </View>
 
       <View className="flex-row items-center gap-1">

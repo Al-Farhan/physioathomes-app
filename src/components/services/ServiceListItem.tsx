@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
-import LottieView from "lottie-react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -14,8 +13,6 @@ type ServiceListItemProps = {
   subtitle: string;
   tags: string[];
   gradient: [string, string] | string[];
-  lottie: any;
-  isActive?: boolean; // true when visible
   onPress?: () => void;
 };
 
@@ -24,21 +21,13 @@ const ServiceListItem = ({
   subtitle,
   tags,
   gradient,
-  lottie,
-  isActive,
   onPress,
 }: ServiceListItemProps) => {
   const scale = useSharedValue(1);
-  const lottieRef = useRef<LottieView>(null);
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
-  useEffect(() => {
-    // play only when visible
-    if (isActive) lottieRef.current?.play();
-    else lottieRef.current?.pause();
-  }, [isActive]);
   return (
     <Animated.View style={[styles.wrap, animatedStyle]}>
       <Pressable
@@ -69,16 +58,6 @@ const ServiceListItem = ({
                 ))}
               </View>
             </View>
-
-            <View style={styles.lottieBox}>
-              <LottieView
-                ref={lottieRef}
-                source={lottie}
-                autoPlay={false}
-                loop
-                style={{ width: 92, height: 92 }}
-              />
-            </View>
           </View>
 
           <View style={styles.bottomRow}>
@@ -88,25 +67,6 @@ const ServiceListItem = ({
       </Pressable>
     </Animated.View>
   );
-
-  // const animationRef = useRef<LottieView>(null);
-  // return (
-  //   <Link href={"/(user)/services"} asChild>
-  //     <Pressable className="px-2 w-full justify-center items-center bg-gray-100 py-4 rounded-md">
-  //       <Text>{item}</Text>
-  //       {/* <NeurologicalRehabAnimation /> */}
-  //       <View>
-  //         <LottieView
-  //           ref={animationRef}
-  //           source={LOTTIE.cylinder}
-  //           autoPlay
-  //           loop
-  //           style={{ width: 180, height: 180 }}
-  //         />
-  //       </View>
-  //     </Pressable>
-  //   </Link>
-  // );
 };
 
 export default ServiceListItem;
@@ -165,16 +125,6 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.92)",
     fontSize: 12,
     fontWeight: "600",
-  },
-  lottieBox: {
-    width: 104,
-    height: 104,
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.16)",
   },
   bottomRow: {
     marginTop: 14,

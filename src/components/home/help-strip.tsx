@@ -16,7 +16,7 @@ export function HelpStrip({ onPress }: HelpStripProps) {
       accessibilityLabel="Need help? Talk to our care team"
       className="min-h-12 flex-row items-center justify-between rounded-card bg-surface-alt px-4 py-3.5 active:bg-line"
     >
-      <Text className="text-label text-ink-secondary">
+      <Text className="font-sans text-label text-ink-secondary">
         Need help? Talk to our care team.
       </Text>
       <ChevronRight size={16} color={colors.ink.tertiary} strokeWidth={1.75} />

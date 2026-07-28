@@ -41,7 +41,7 @@ export default function HomeScreen() {
           router.push("/(user)/services");
           break;
         case "exercises":
-          // TODO: exercises screen not built yet
+          router.push("/exercises");
           break;
         case "reports":
           router.push("/user-activity");
@@ -90,12 +90,8 @@ export default function HomeScreen() {
           if (nextSession)
             Linking.openURL(`tel:${nextSession.therapist.phone}`);
         }}
-        onTrack={() => {
-          // TODO: live tracking screen not built yet
-        }}
-        onReschedule={() => {
-          // TODO: reschedule flow not built yet
-        }}
+        onTrack={() => router.push("/track-session")}
+        onReschedule={() => router.push("/reschedule")}
         onBook={() => router.push("/(user)/services")}
       />
     ),
@@ -109,9 +105,7 @@ export default function HomeScreen() {
       recovery && (
         <RecoveryProgressCard
           recovery={recovery}
-          onPress={() => {
-            // TODO: care plan screen not built yet
-          }}
+          onPress={() => router.push("/care-plan")}
         />
       ),
   });
@@ -137,9 +131,7 @@ export default function HomeScreen() {
             firstName={firstName}
             avatarUrl={home.user.data?.avatarUrl ?? null}
             hasUnreadNotifications={(home.user.data?.unreadNotifications ?? 0) > 0}
-            onPressNotifications={() => {
-              // TODO: notifications screen not built yet
-            }}
+            onPressNotifications={() => router.push("/notifications")}
             onPressProfile={() => router.push("/(user)/profile")}
           />
 
@@ -162,9 +154,7 @@ export default function HomeScreen() {
               <TodaysExercises
                 exercises={exercises}
                 onToggleDone={handleToggleExercise}
-                onViewAll={() => {
-                  // TODO: exercises screen not built yet
-                }}
+                onViewAll={() => router.push("/exercises")}
               />
             ),
           })}

@@ -27,11 +27,14 @@ export const colors = {
   danger: "#DC2626",
 } as const;
 
-// Single family. Inter is the target face; until @expo-google-fonts/inter is
-// added (new dependency — needs approval), the system font is used. Weights
-// limited to 400 / 500 / 600.
+// Single family: Inter, weights 400/500/600 only. Runtime-loaded fonts
+// register one family name per weight, so weight is selected via the
+// font-sans / font-sans-medium / font-sans-semibold classes rather than
+// fontWeight utilities.
 export const fontFamily = {
-  sans: ["Inter", "System"],
+  sans: ["Inter_400Regular"],
+  "sans-medium": ["Inter_500Medium"],
+  "sans-semibold": ["Inter_600SemiBold"],
 } as const;
 
 export const fontSize = {

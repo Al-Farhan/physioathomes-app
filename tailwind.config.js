@@ -1,5 +1,6 @@
 const {
   colors,
+  fontFamily,
   fontSize,
   spacing,
   borderRadius,
@@ -13,6 +14,7 @@ module.exports = {
   theme: {
     extend: {
       colors,
+      fontFamily,
       fontSize,
       spacing,
       borderRadius,
